@@ -8,4 +8,9 @@
         android:title="@string/about"
         app:showAsAction="ifRoom"/>
 
+    <item
+        android:id="@+id/source"
+        android:title="@string/src"
+        app:showAsAction="collapseActionView"/>
+
 </menu>

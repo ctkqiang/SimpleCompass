@@ -126,6 +126,14 @@ public class CompassActivity extends AppCompatActivity implements SensorEventLis
                 }
             }).show();
         }
+
+        if (ID == R.id.source){
+            String url;
+            url = "https://github.com/johnmelodyme/SimpleCompass";
+            Intent i = new Intent(Intent.ACTION_VIEW);
+            i.setData(Uri.parse(url));
+            startActivity(i);
+        }
         return super.onOptionsItemSelected(item);
     }
 }
