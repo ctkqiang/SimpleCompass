@@ -136,4 +136,10 @@ public class CompassActivity extends AppCompatActivity implements SensorEventLis
         }
         return super.onOptionsItemSelected(item);
     }
+
+
+    @Override
+    public void onBackPressed(){
+        super.onBackPressed();
+    }
 }
