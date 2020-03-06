@@ -1,19 +1,13 @@
 package com.johnmelodyme.simplecompass;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.location.Location;
-import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Looper;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -23,18 +17,10 @@ import android.view.animation.RotateAnimation;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
 
 import com.example.flatdialoglibrary.dialog.FlatDialog;
 import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationCallback;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationResult;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -78,7 +64,6 @@ public class CompassActivity extends AppCompatActivity implements SensorEventLis
         setContentView(R.layout.activity_main);
         Log.d(TAG, "Starting " + CompassActivity.class.getName().toUpperCase());
         declaractionInit();
-        getUserLocation();
     }
 
     @Override
@@ -103,9 +88,6 @@ public class CompassActivity extends AppCompatActivity implements SensorEventLis
 
         */
 
-        if (checkPermissions()){
-            getUserLocation();
-        }
     }
 
     @SuppressLint("SetTextI18n")
@@ -193,84 +175,4 @@ public class CompassActivity extends AppCompatActivity implements SensorEventLis
     public void onBackPressed(){
         super.onBackPressed();
     }
-
-    private boolean checkPermissions() {
-        if (ActivityCompat.checkSelfPermission(this,
-                Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
-                ActivityCompat.checkSelfPermission(this,
-                        Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            return true;
-        }
-        return false;
-    }
-
-    private void requestPermissions() {
-        ActivityCompat.requestPermissions(
-                this,
-                new String[]{Manifest.permission.ACCESS_COARSE_LOCATION,
-                        Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST);
-    }
-
-    private boolean isLocationEnabled() {
-        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager.isProviderEnabled(
-                LocationManager.NETWORK_PROVIDER
-        );
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == REQUEST) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // Granted. Start getting the location information
-            }
-        }
-    }
-
-
-    @SuppressLint("MissingPermission")
-    private void getUserLocation(){
-        if(checkPermissions()){
-            if (isLocationEnabled()) {
-                fusedLocationClient.getLastLocation().addOnCompleteListener(new OnCompleteListener<Location>() {
-                    @SuppressLint("SetTextI18n")
-                    @Override
-                    public void onComplete(@NonNull Task<Location> LOCATION_TASK) {
-                        Location location = LOCATION_TASK.getResult();
-                        if (location == null ){
-                            requestNewLocationData();
-                        } else {
-                            Lat.setText(location.getLatitude()+"");
-                            Long.setText(location.getLongitude()+"");
-                        }
-                    }
-                });
-            }
-        }
-    }
-
-    @SuppressLint("MissingPermission")
-    private void requestNewLocationData() {
-        LocationRequest locationRequest = new LocationRequest();
-        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        locationRequest.setInterval(0);
-        locationRequest.setFastestInterval(0);
-        locationRequest.setNumUpdates(1);
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-        fusedLocationClient.requestLocationUpdates(
-                locationRequest, locationCallback,
-                Looper.myLooper()
-        );
-    }
-
-    private LocationCallback locationCallback = new LocationCallback() {
-        @SuppressLint("SetTextI18n")
-        @Override
-        public void onLocationResult(LocationResult locationResult) {
-            Location lastLocation = locationResult.getLastLocation();
-            Lat.setText(lastLocation.getLatitude()+"");
-            Long.setText(lastLocation.getLongitude()+"");
-        }
-    };
 }
