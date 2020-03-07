@@ -46,16 +46,16 @@ import java.util.Locale;
 public class CompassActivity extends AppCompatActivity implements SensorEventListener {
     private static final String TAG = "Compass";
     public static DecimalFormat DECIMAL_FORMATTER;
-    private FusedLocationProviderClient fusedLocationClient;
-    private FlatDialog flatDialog;
-    private SensorManager compassSensor, magneticField;
-    private LocationManager locationManager;
-    private ImageView compassImage;
-    private float degreeStart = 0f;
+    private static FusedLocationProviderClient fusedLocationClient;
+    private static FlatDialog flatDialog;
+    private static SensorManager compassSensor, magneticField;
+    private static LocationManager locationManager;
+    private static ImageView compassImage;
+    private static float degreeStart = 0f;
     public static TextView degreeTV, mField, Lat, Long, distance, time, speed;
-    private Button button_start, button_stop;
-    private int REQUEST = 0x2c;
-    private LocationService locationService;
+    private static Button button_start, button_stop;
+    private static int REQUEST = 0x2c;
+    private static LocationService locationService;
     public static boolean status;
     public static long startTime, endTime;
     public static ProgressDialog locate;
@@ -314,7 +314,9 @@ public class CompassActivity extends AppCompatActivity implements SensorEventLis
     // TODO onDestroy
     protected void onDestroy(){
         super.onDestroy();
-        if (status == true)
+        if (status == true) {
             unBindService();
+        }
+        System.gc();
     }
 }

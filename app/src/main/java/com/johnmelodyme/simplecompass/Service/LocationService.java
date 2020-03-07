@@ -8,7 +8,6 @@ import android.location.LocationListener;
 import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -128,12 +127,10 @@ public class LocationService extends Service implements LocationListener,
     @Override
     // TODO onConnected
     public void onConnected(@Nullable Bundle bundle) {
-        try {
-            LocationServices.FusedLocationApi.requestLocationUpdates(
-                    googleApiClient, locationRequest, (com.google.android.gms.location.LocationListener) this);
-        } catch (SecurityException e) {
-            Log.d(TAG, "error >> " + e);
-        }
+        LocationServices.FusedLocationApi
+                .requestLocationUpdates(googleApiClient, locationRequest,
+                        (com.google.android.gms.location.LocationListener) this);
+
     }
 
     // TODO stopLocationUpdates
