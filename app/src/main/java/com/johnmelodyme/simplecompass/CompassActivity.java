@@ -1,13 +1,17 @@
 package com.johnmelodyme.simplecompass;
 
 import android.annotation.SuppressLint;
+import android.app.ProgressDialog;
+import android.content.ComponentName;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -21,6 +25,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.flatdialoglibrary.dialog.FlatDialog;
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.johnmelodyme.simplecompass.Service.LocationService;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -40,16 +45,22 @@ public class CompassActivity extends AppCompatActivity implements SensorEventLis
     private SensorManager compassSensor, magneticField;
     private ImageView compassImage;
     private float degreeStart = 0f;
-    private TextView degreeTV, mField, Lat, Long;
+    private TextView degreeTV, mField, Lat, Long, Distance, Time, Speed;
     private int REQUEST = 0x2c;
+    private LocationService locationService;
+    public static boolean status;
+    public static long startTime, endTime;
+    public static ProgressDialog locate;
+    public static int P = 0x0;
 
-    // TODO Declaraction:
+    // TODO declaractionInit()
     private void declaractionInit(){
         compassImage = findViewById(R.id.compass);
         degreeTV = findViewById(R.id.degree);
         mField = findViewById(R.id.magneticField);
         Lat = findViewById(R.id.la);
         Long = findViewById(R.id.lo);
+        Distance = findViewById(R.id.distance);
         compassSensor = (SensorManager) getSystemService(SENSOR_SERVICE);
         //magneticField = (SensorManager) getSystemService(SENSOR_SERVICE);
         flatDialog = new FlatDialog(CompassActivity.this);
@@ -59,6 +70,7 @@ public class CompassActivity extends AppCompatActivity implements SensorEventLis
     }
 
     @Override
+    // TODO onCreate
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -67,6 +79,7 @@ public class CompassActivity extends AppCompatActivity implements SensorEventLis
     }
 
     @Override
+    // TODO onPause
     protected void onPause() {
         super.onPause();
         // to stop the listener and save battery
@@ -75,6 +88,7 @@ public class CompassActivity extends AppCompatActivity implements SensorEventLis
     }
 
     @Override
+    //TODO onResume
     protected void onResume() {
         super.onResume();
         // code for system's orientation sensor registered listeners
@@ -87,17 +101,16 @@ public class CompassActivity extends AppCompatActivity implements SensorEventLis
                 SensorManager.SENSOR_DELAY_NORMAL);
 
         */
-
     }
 
     @SuppressLint("SetTextI18n")
     @Override
+    // TODO onSensorChanged:
     public void onSensorChanged(SensorEvent event) {
-        // TODO onSensorChanged:
         // get angle around the z-axis rotated
         float degree = Math.round(event.values[0]);
         degreeTV.setText("Heading: " + degree + " °degrees");
-        Log.d(TAG, "Compass =============>  Heading: " + degree + " °degrees");
+        Log.d(TAG, "Compass ==========>  Heading: " + degree + " °degrees");
         RotateAnimation ra = new RotateAnimation(
                 degreeStart,
                 -degree,
@@ -109,8 +122,6 @@ public class CompassActivity extends AppCompatActivity implements SensorEventLis
         // Start animation of compass image
         compassImage.startAnimation(ra);
         degreeStart = -degree;
-
-
 //        // Magnetic field :
 //        if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
 //            // get values for each axes X,Y,Z
@@ -123,17 +134,20 @@ public class CompassActivity extends AppCompatActivity implements SensorEventLis
     }
 
     @Override
+    // TODO onAccuracyChanged
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
         // Not Available
     }
 
     @Override
+    // TODO onCreateOptionMenu
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu, menu);
         return true;
     }
 
     @Override
+    // TODO onOptionsItemSelected
     public boolean onOptionsItemSelected(MenuItem item) {
         int ID = item.getItemId();
 
@@ -154,9 +168,9 @@ public class CompassActivity extends AppCompatActivity implements SensorEventLis
                 public void onClick(View v) {
                     String url;
                     url = "https://johnmelodyme.github.io/";
-                    Intent i = new Intent(Intent.ACTION_VIEW);
-                    i.setData(Uri.parse(url));
-                    startActivity(i);
+                    Intent intent = new Intent(Intent.ACTION_VIEW);
+                    intent.setData(Uri.parse(url));
+                    startActivity(intent);
                 }
             }).show();
         }
@@ -164,15 +178,31 @@ public class CompassActivity extends AppCompatActivity implements SensorEventLis
         if (ID == R.id.source){
             String url;
             url = "https://github.com/johnmelodyme/SimpleCompass";
-            Intent i = new Intent(Intent.ACTION_VIEW);
-            i.setData(Uri.parse(url));
-            startActivity(i);
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setData(Uri.parse(url));
+            startActivity(intent);
         }
         return super.onOptionsItemSelected(item);
     }
 
     @Override
+    // TODO onBackPressed
     public void onBackPressed(){
+        //
         super.onBackPressed();
     }
+
+    private ServiceConnection serviceConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            LocationService.LocalBinder localBinder = (LocationService.LocalBinder) service;
+            locationService = localBinder.getService();
+            status = true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            status = false ;
+        }
+    };
 }
