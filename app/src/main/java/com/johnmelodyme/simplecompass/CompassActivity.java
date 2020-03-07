@@ -83,6 +83,13 @@ public class CompassActivity extends AppCompatActivity implements SensorEventLis
     }
 
     @Override
+    public void onStart(){
+        super.onStart();
+        button_start.setVisibility(View.INVISIBLE);
+        button_stop.setVisibility(View.INVISIBLE);
+    }
+
+    @Override
     // TODO onCreate
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
