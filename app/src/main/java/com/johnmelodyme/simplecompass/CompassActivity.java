@@ -192,6 +192,7 @@ public class CompassActivity extends AppCompatActivity implements SensorEventLis
         super.onBackPressed();
     }
 
+    // TODO serviceConnection
     private ServiceConnection serviceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
@@ -205,4 +206,22 @@ public class CompassActivity extends AppCompatActivity implements SensorEventLis
             status = false ;
         }
     };
+
+    // TODO bindService
+    public void bindService(){
+        if (status == true)
+            return;
+        Intent i = new Intent(getApplicationContext(), LocationService.class);
+        bindService(i, serviceConnection, BIND_AUTO_CREATE);
+        startTime = System.currentTimeMillis();
+    }
+
+    // TODO unBindService
+    public void unBindService(){
+        if (status == false)
+            return;
+        Intent i = new Intent(getApplicationContext(), LocationService.class);
+        unBindService();
+        status = false;
+    }
 }
