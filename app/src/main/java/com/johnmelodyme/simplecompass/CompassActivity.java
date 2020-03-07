@@ -52,7 +52,7 @@ public class CompassActivity extends AppCompatActivity implements SensorEventLis
     private LocationManager locationManager;
     private ImageView compassImage;
     private float degreeStart = 0f;
-    private TextView degreeTV, mField, Lat, Long, distance, time, speed;
+    public static TextView degreeTV, mField, Lat, Long, distance, time, speed;
     private Button button_start, button_stop;
     private int REQUEST = 0x2c;
     private LocationService locationService;

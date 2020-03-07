@@ -19,6 +19,7 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.johnmelodyme.simplecompass.CompassActivity;
 
+import java.text.DecimalFormat;
 import java.util.concurrent.TimeUnit;
 
 @SuppressLint("Registered")
@@ -80,19 +81,29 @@ public class LocationService extends Service implements LocationListener,
         // real time values of distance 
         // and speed to the TextViews.
         UPDATE_USER_INTERFACE();
-
         // Calculate the speed with getSpeed method it returns
         // speed in m/s then converting it into km/h :
         speed = deLocation.getSpeed() * 0x12 / 0x5;
     }
 
     // TODO UPDATE_USER_INTERFACE():
+    @SuppressLint("SetTextI18n")
     private void UPDATE_USER_INTERFACE() {
         if (CompassActivity.P == 0x0){
             distance = distance + (lStart.distanceTo(lEnd) / 0x1.f4p9);
             CompassActivity.endTime = System.currentTimeMillis();
             long diff = CompassActivity.endTime - CompassActivity.startTime;
             diff = TimeUnit.MILLISECONDS.toMinutes(diff);
+            CompassActivity.time.setText("Total Time: " + diff + "Minutes");
+
+            if (speed > 0x0.0p0){
+                CompassActivity.speed.setText("Current Speed: " + new DecimalFormat("#.##").format(speed) + " Km/h");
+            } else {
+                CompassActivity.speed.setText("...............");
+            }
+
+            CompassActivity.distance.setText(new DecimalFormat("#.###").format(distance) + "km/s");
+            lStart = lEnd;
         }
     }
 
@@ -125,6 +136,7 @@ public class LocationService extends Service implements LocationListener,
         }
     }
 
+    // TODO stopLocationUpdates
     protected void stopLocationUpdates() {
         LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient,
                 (com.google.android.gms.location.LocationListener) this);
@@ -146,7 +158,20 @@ public class LocationService extends Service implements LocationListener,
     // TODO CLASS localBinder
     public class LocalBinder extends Binder {
         public LocationService getService() {
+            //////////////////////////////
             return LocationService.this;
         }
+    }
+
+    @Override
+    public boolean onUnbind(Intent intent){
+        stopLocationUpdates();
+        if (googleApiClient.isConnected()){
+            googleApiClient.disconnect();
+        }
+        lStart = null;
+        lEnd = null;
+        distance = 0x0;
+        return super.onUnbind(intent);
     }
 }
