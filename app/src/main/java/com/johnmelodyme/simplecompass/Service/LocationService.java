@@ -47,6 +47,7 @@ public class LocationService extends Service implements LocationListener,
     }
 
     // TODO initLocationRequest();
+    @SuppressLint("RestrictedApi")
     private void initLocationRequest() {
         locationRequest = new LocationRequest();
         locationRequest.setInterval(INTERVAL);

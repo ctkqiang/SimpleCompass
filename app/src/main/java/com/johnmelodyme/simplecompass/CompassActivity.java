@@ -1,23 +1,29 @@
 package com.johnmelodyme.simplecompass;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.ComponentName;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.RotateAnimation;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -43,9 +49,11 @@ public class CompassActivity extends AppCompatActivity implements SensorEventLis
     private FusedLocationProviderClient fusedLocationClient;
     private FlatDialog flatDialog;
     private SensorManager compassSensor, magneticField;
+    private LocationManager locationManager;
     private ImageView compassImage;
     private float degreeStart = 0f;
     private TextView degreeTV, mField, Lat, Long, Distance, Time, Speed;
+    private Button button_start, button_stop;
     private int REQUEST = 0x2c;
     private LocationService locationService;
     public static boolean status;
@@ -61,7 +69,10 @@ public class CompassActivity extends AppCompatActivity implements SensorEventLis
         Lat = findViewById(R.id.la);
         Long = findViewById(R.id.lo);
         Distance = findViewById(R.id.distance);
+        button_start = findViewById(R.id.btn_start);
+        button_stop = findViewById(R.id.btn_stop);
         compassSensor = (SensorManager) getSystemService(SENSOR_SERVICE);
+        locationManager = (LocationManager)getApplicationContext().getSystemService(LOCATION_SERVICE);
         //magneticField = (SensorManager) getSystemService(SENSOR_SERVICE);
         flatDialog = new FlatDialog(CompassActivity.this);
         DecimalFormatSymbols symbols = new DecimalFormatSymbols(Locale.UK);
@@ -76,6 +87,75 @@ public class CompassActivity extends AppCompatActivity implements SensorEventLis
         setContentView(R.layout.activity_main);
         Log.d(TAG, "Starting " + CompassActivity.class.getName().toUpperCase());
         declaractionInit();
+
+        // TODO OnClick button_start
+        button_start.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //The method below checks if Location is enabled on device or not.
+                // If not, then an alert dialog box appears with option to
+                // enable the gps.
+                checkTheGps();
+                if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+                    return;
+                }
+
+                if (status == false){
+                    //Here, the Location Service gets bound and the GPS Speedometer gets Active.
+                    bindService();
+                }
+
+                Context Main = CompassActivity.this;
+                locate = new ProgressDialog(Main);
+                locate.setIndeterminate(true);
+                locate.setCancelable(false);
+                locate.setMessage("Getting Location...");
+                locate.show();
+                button_start.setVisibility(View.GONE);
+                button_stop.setVisibility(View.VISIBLE);
+            }
+        });
+
+        // TODO btn_stop
+        button_stop.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (status == true) {
+                    unBindService();
+                }
+                button_start.setVisibility(View.VISIBLE);
+                button_stop.setVisibility(View.GONE);
+                P = 0;
+            }
+        });
+    }
+
+    // TODO checkTheGps()
+    public void checkTheGps() {
+        if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
+            showAlertDialogueTouUser();
+        }
+    }
+
+    // TODO showAlertDialogueTouUser()
+    private void showAlertDialogueTouUser() {
+        Context context = this;
+        AlertDialog.Builder alert = new AlertDialog.Builder(context);
+        alert.setMessage("Enable GPS to use application")
+                .setCancelable(false)
+                .setPositiveButton("Enable GPS", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Intent CALL_DEVICE_GPS_SETTING;
+                        CALL_DEVICE_GPS_SETTING = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                        startActivity(CALL_DEVICE_GPS_SETTING);
+                    }
+                }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogue, int which) {
+                    dialogue.cancel();
+                }
+        }).create().show();
     }
 
     @Override
@@ -99,7 +179,6 @@ public class CompassActivity extends AppCompatActivity implements SensorEventLis
         magneticField.registerListener(this,
                 magneticField.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD),
                 SensorManager.SENSOR_DELAY_NORMAL);
-
         */
     }
 
@@ -188,8 +267,11 @@ public class CompassActivity extends AppCompatActivity implements SensorEventLis
     @Override
     // TODO onBackPressed
     public void onBackPressed(){
-        //
         super.onBackPressed();
+        if (status == false)
+            super.onBackPressed();
+        else
+            moveTaskToBack(true);
     }
 
     // TODO serviceConnection
@@ -211,7 +293,8 @@ public class CompassActivity extends AppCompatActivity implements SensorEventLis
     public void bindService(){
         if (status == true)
             return;
-        Intent i = new Intent(getApplicationContext(), LocationService.class);
+        Intent i;
+        i = new Intent(getApplicationContext(), LocationService.class);
         bindService(i, serviceConnection, BIND_AUTO_CREATE);
         startTime = System.currentTimeMillis();
     }
@@ -220,8 +303,16 @@ public class CompassActivity extends AppCompatActivity implements SensorEventLis
     public void unBindService(){
         if (status == false)
             return;
-        Intent i = new Intent(getApplicationContext(), LocationService.class);
+        Intent i;
+        i = new Intent(getApplicationContext(), LocationService.class);
         unBindService();
         status = false;
+    }
+
+    // TODO onDestroy
+    protected void onDestroy(){
+        super.onDestroy();
+        if (status == true)
+            unBindService();
     }
 }

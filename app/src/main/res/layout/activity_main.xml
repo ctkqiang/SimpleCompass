@@ -18,7 +18,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical" >
+            android:orientation="vertical">
 
             <ImageView
                 android:id="@+id/compass"
@@ -62,8 +62,8 @@
                 android:textAllCaps="true"
                 android:textColor="@android:color/black"
                 android:textSize="18sp"
-                android:visibility="invisible"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:visibility="invisible" />
 
             <TextView
                 android:id="@+id/la"
@@ -74,8 +74,8 @@
                 android:textAllCaps="true"
                 android:textColor="@android:color/black"
                 android:textSize="18sp"
-                android:visibility="invisible"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:visibility="invisible" />
 
             <TextView
                 android:id="@+id/distance"
@@ -114,7 +114,7 @@
                 android:visibility="invisible" />
 
             <Button
-                android:id="@+id/start"
+                android:id="@+id/btn_start"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="45dp"
@@ -122,7 +122,20 @@
                 android:layout_marginEnd="45dp"
                 android:layout_marginBottom="4dp"
                 android:background="@drawable/buttonnripple"
-                android:text="@string/start" />
+                android:text="@string/start"
+                android:textColor="@color/text" />
+
+            <Button
+                android:id="@+id/btn_stop"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="45dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginEnd="45dp"
+                android:layout_marginBottom="4dp"
+                android:background="@drawable/buttonnripple"
+                android:text="@string/stop"
+                android:textColor="@color/text" />
         </LinearLayout>
     </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>
