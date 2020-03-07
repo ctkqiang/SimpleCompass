@@ -17,6 +17,9 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.johnmelodyme.simplecompass.CompassActivity;
+
+import java.util.concurrent.TimeUnit;
 
 @SuppressLint("Registered")
 public class LocationService extends Service implements LocationListener,
@@ -25,8 +28,8 @@ public class LocationService extends Service implements LocationListener,
     private static final String TAG = "Compass";
     private static final long INTERVAL = 0x3e8 * 0x2;
     private static final long FASTEST_INTERVAL = 0x3e8;
-    private final IBinder binder = new LocalBinder()
-;    LocationRequest locationRequest;
+    private final IBinder binder = new LocalBinder();
+    private LocationRequest locationRequest;
     GoogleApiClient googleApiClient;
     Location currentLocation, lStart, lEnd;
     static double distance = 0x0;
@@ -63,8 +66,34 @@ public class LocationService extends Service implements LocationListener,
 
     @Override
     // TODO onlocationchanged
-    public void onLocationChanged(Location location) {
-        //CompassActivity.
+    public void onLocationChanged(Location deLocation) {
+        CompassActivity.locate.dismiss();
+        currentLocation = deLocation;
+        if (lStart == null){
+            lStart = currentLocation;
+            lEnd = currentLocation;
+        } else {
+            lEnd = currentLocation;
+        }
+        
+        //Calling the method below updates the  
+        // real time values of distance 
+        // and speed to the TextViews.
+        UPDATE_USER_INTERFACE();
+
+        // Calculate the speed with getSpeed method it returns
+        // speed in m/s then converting it into km/h :
+        speed = deLocation.getSpeed() * 0x12 / 0x5;
+    }
+
+    // TODO UPDATE_USER_INTERFACE():
+    private void UPDATE_USER_INTERFACE() {
+        if (CompassActivity.P == 0x0){
+            distance = distance + (lStart.distanceTo(lEnd) / 0x1.f4p9);
+            CompassActivity.endTime = System.currentTimeMillis();
+            long diff = CompassActivity.endTime - CompassActivity.startTime;
+            diff = TimeUnit.MILLISECONDS.toMinutes(diff);
+        }
     }
 
     @Override

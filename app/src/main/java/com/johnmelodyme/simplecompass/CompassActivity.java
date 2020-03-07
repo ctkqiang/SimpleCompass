@@ -52,7 +52,7 @@ public class CompassActivity extends AppCompatActivity implements SensorEventLis
     private LocationManager locationManager;
     private ImageView compassImage;
     private float degreeStart = 0f;
-    private TextView degreeTV, mField, Lat, Long, Distance, Time, Speed;
+    private TextView degreeTV, mField, Lat, Long, distance, time, speed;
     private Button button_start, button_stop;
     private int REQUEST = 0x2c;
     private LocationService locationService;
@@ -68,7 +68,9 @@ public class CompassActivity extends AppCompatActivity implements SensorEventLis
         mField = findViewById(R.id.magneticField);
         Lat = findViewById(R.id.la);
         Long = findViewById(R.id.lo);
-        Distance = findViewById(R.id.distance);
+        distance = findViewById(R.id.distance);
+        time = findViewById(R.id.time);
+        speed = findViewById(R.id.speed);
         button_start = findViewById(R.id.btn_start);
         button_stop = findViewById(R.id.btn_stop);
         compassSensor = (SensorManager) getSystemService(SENSOR_SERVICE);
