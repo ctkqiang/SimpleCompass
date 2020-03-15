@@ -24,17 +24,16 @@ import java.util.concurrent.TimeUnit;
 
 @SuppressLint("Registered")
 public class LocationService extends Service implements LocationListener,
-        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener{
-
-    private static final String TAG = "Compass";
-    private static final long INTERVAL = 0x3e8 * 0x2;
-    private static final long FASTEST_INTERVAL = 0x3e8;
-    private final IBinder binder = new LocalBinder();
-    private LocationRequest locationRequest;
-    GoogleApiClient googleApiClient;
-    Location currentLocation, lStart, lEnd;
-    static double distance = 0x0;
-    double speed;
+        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+    public static final String TAG = "Compass";
+    public static final long INTERVAL = 0x3e8 * 0x2;
+    public static final long FASTEST_INTERVAL = 0x3e8;
+    public final IBinder binder = new LocalBinder();
+    public LocationRequest locationRequest;
+    public GoogleApiClient googleApiClient;
+    public Location currentLocation, lStart, lEnd;
+    public static double distance = 0x0;
+    public double speed;
 
     @Nullable
     @Override
@@ -146,13 +145,11 @@ public class LocationService extends Service implements LocationListener,
     @Override
     // TODO onConnectionSuspended
     public void onConnectionSuspended(int i) {
-
     }
 
     @Override
     // TODO onConnectionFailed
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-
     }
 
     // TODO CLASS localBinder
