@@ -14,6 +14,7 @@ import androidx.annotation.Nullable;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.johnmelodyme.simplecompass.CompassActivity;
@@ -135,6 +136,8 @@ public class LocationService extends Service implements LocationListener,
 
     // TODO stopLocationUpdates
     protected void stopLocationUpdates() {
+        FusedLocationProviderClient fusedLocationClient;
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(getApplicationContext());
         LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient,
                 (com.google.android.gms.location.LocationListener) this);
         distance = 0;

@@ -1,5 +1,6 @@
 package com.johnmelodyme.simplecompass;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -8,6 +9,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.pm.PackageManager;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -28,6 +30,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.example.flatdialoglibrary.dialog.FlatDialog;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -35,6 +39,7 @@ import com.johnmelodyme.simplecompass.Service.LocationService;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
+import java.util.Arrays;
 import java.util.Locale;
 
 /**
@@ -44,23 +49,23 @@ import java.util.Locale;
  */
 
 public class CompassActivity extends AppCompatActivity implements SensorEventListener {
-    private static final String TAG = "Compass";
+    public static final String TAG = "Compass";
     public static DecimalFormat DECIMAL_FORMATTER;
     private static FusedLocationProviderClient fusedLocationClient;
     private static FlatDialog flatDialog;
     private static SensorManager compassSensor, magneticField;
-    private static LocationManager locationManager;
-    private static ImageView compassImage;
-    private static float degreeStart = 0f;
+    public static LocationManager locationManager;
+    public static ImageView compassImage;
+    public static float degreeStart = 0f;
     public static TextView degreeTV, mField, Lat, Long, distance, time, speed;
     private static Button button_start, button_stop;
-    private static int REQUEST = 0x2c;
-    private static LocationService locationService;
+    public static LocationService locationService;
     public static boolean status;
     public static long startTime, endTime;
     public static ProgressDialog locate;
     public static int P = 0x0;
-
+    public static final int REQUEST_LOCATION = 1;
+    
     // TODO declaractionInit()
     private void declaractionInit(){
         compassImage = findViewById(R.id.compass);
@@ -80,13 +85,20 @@ public class CompassActivity extends AppCompatActivity implements SensorEventLis
         DecimalFormatSymbols symbols = new DecimalFormatSymbols(Locale.UK);
         symbols.setDecimalSeparator('.');
         DECIMAL_FORMATTER = new DecimalFormat("#.000", symbols);
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+            }, REQUEST_LOCATION);
+        } else {
+            Log.d(TAG, "declaractionInit: " + Arrays.hashCode(CompassActivity.class.getSimpleName().getBytes()));
+        }
     }
 
     @Override
     public void onStart(){
         super.onStart();
-        button_start.setVisibility(View.INVISIBLE);
-        button_stop.setVisibility(View.INVISIBLE);
     }
 
     @Override
@@ -96,6 +108,7 @@ public class CompassActivity extends AppCompatActivity implements SensorEventLis
         setContentView(R.layout.activity_main);
         Log.d(TAG, "Starting " + CompassActivity.class.getName().toUpperCase());
         declaractionInit();
+
 
         // TODO OnClick button_start
         button_start.setOnClickListener(new View.OnClickListener() {
@@ -197,7 +210,10 @@ public class CompassActivity extends AppCompatActivity implements SensorEventLis
     public void onSensorChanged(SensorEvent event) {
         // get angle around the z-axis rotated
         float degree = Math.round(event.values[0]);
-        degreeTV.setText("Heading: " + degree + " °degrees");
+        String heading, degrees;
+        heading = "Heading: ";
+        degrees = " °degrees";
+        degreeTV.setText(heading + degree + degrees);
         Log.d(TAG, "Compass ==========>  Heading: " + degree + " °degrees");
         RotateAnimation ra = new RotateAnimation(
                 degreeStart,
@@ -241,7 +257,7 @@ public class CompassActivity extends AppCompatActivity implements SensorEventLis
 
         if (ID == R.id.about){
             flatDialog.setTitle("About")
-                    .setSubtitle("Created By John Melody Melissa & Tan Sin Dee")
+                    .setSubtitle("Created By John Melody Melissa & Tan Sin Dee ❤")
                     .setFirstButtonText("Okay")
                     .setSecondButtonText("Author's Portfolio")
                     .withFirstButtonListner(new View.OnClickListener() {
@@ -324,6 +340,12 @@ public class CompassActivity extends AppCompatActivity implements SensorEventLis
         if (status == true) {
             unBindService();
         }
+        DestroyAll();
+    }
+
+    // TODO DestroyAll()
+    public void DestroyAll() {
+        finish();
         System.gc();
     }
 }
