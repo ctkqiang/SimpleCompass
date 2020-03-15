@@ -221,11 +221,11 @@ public class CompassActivity extends AppCompatActivity implements SensorEventLis
                 Animation.RELATIVE_TO_SELF, 0.5f,
                 Animation.RELATIVE_TO_SELF, 0.5f);
         ra.setFillAfter(true);
-        // set how long the animation for the compass image will take place
+        // set how long the animation for the compass image will take place:
         ra.setDuration(210);
         // Start animation of compass image
         compassImage.startAnimation(ra);
-        degreeStart = -degree;
+        degreeStart =- degree;
 //        // Magnetic field :
 //        if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
 //            // get values for each axes X,Y,Z
